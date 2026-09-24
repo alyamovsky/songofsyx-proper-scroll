@@ -1,0 +1,7 @@
+VERSION: "1.0.0",
+GAME_VERSION_MAJOR: 71,
+GAME_VERSION_MINOR: 44,
+NAME: "Proper Scroll",
+DESC: "Side panels scroll with the mouse wheel when their content is taller than the screen. Fixes UI mods pushing room panel content off screen.",
+AUTHOR: "aliamovskii",
+INFO: "Replaces one vanilla UI class (view.interrupter.ISidePanels). Any side panel whose content does not fit vertically gets mouse wheel scrolling and a thin scroll indicator. Nothing else changes. Incompatible only with mods that replace the same class.",
