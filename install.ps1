@@ -1,12 +1,12 @@
-# Copies the built mod into the game's local mods folder on Windows.
-# Build first: ./build.sh in Git Bash, or copy build/mod from another machine.
+# Copies the mod from dist/ into the game's local mods folder on Windows. No JDK needed.
+# If scripts are blocked: powershell -ExecutionPolicy Bypass -File .\install.ps1
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
 $modsDir = if ($env:SOS_MODS_DIR) { $env:SOS_MODS_DIR } else { Join-Path $env:APPDATA "songsofsyx\mods" }
-$src = Join-Path $PSScriptRoot "build\mod\ProperScroll"
+$src = Join-Path $PSScriptRoot "dist\ProperScroll"
 if (-not (Test-Path $src)) {
-    Write-Error "Nothing built yet: build/mod/ProperScroll is missing"
+    Write-Error "dist/ProperScroll is missing, run build.sh to recreate it"
 }
 New-Item -ItemType Directory -Force -Path $modsDir | Out-Null
 $dst = Join-Path $modsDir "ProperScroll"

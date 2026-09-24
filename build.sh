@@ -56,3 +56,9 @@ MOD_VERSION=$(sed -n 's/^VERSION: "\(.*\)",/\1/p' mod/_Info.txt)
 ZIP="$OUT/ProperScroll-$MOD_VERSION.zip"
 jar cfM "$ZIP" -C "$OUT/mod" .
 echo "Packed $ZIP"
+
+# Committed copy so the mod can be installed from a checkout without a JDK
+rm -rf dist/ProperScroll
+mkdir -p dist
+cp -R "$MOD" dist/ProperScroll
+echo "Updated dist/ProperScroll"

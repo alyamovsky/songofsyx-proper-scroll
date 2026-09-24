@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copies the built mod into the game's local mods folder. Run build.sh first.
+# Copies the mod from dist/ into the game's local mods folder. No JDK needed.
 # On Windows without Git Bash use install.ps1 instead.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -11,9 +11,9 @@ case "$(uname -s)" in
 esac
 MODS_DIR="${SOS_MODS_DIR:-$DEFAULT_MODS}"
 
-SRC=build/mod/ProperScroll
+SRC=dist/ProperScroll
 if [ ! -d "$SRC" ]; then
-    echo "Nothing built yet, run ./build.sh first" >&2
+    echo "dist/ProperScroll is missing, run ./build.sh to recreate it" >&2
     exit 1
 fi
 mkdir -p "$MODS_DIR"
