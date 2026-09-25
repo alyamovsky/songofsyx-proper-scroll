@@ -1,111 +1,113 @@
-# Proper Scroll — мод для Songs of Syx
+# Proper Scroll, a Songs of Syx mod
 
-Боковые панели (комнаты, подданные и т.д.) получают прокрутку колесом мыши, если их
-содержимое не влезает по высоте экрана. Появился из-за конфликта UI-модов
-**Extra Info** и **Industry Insights**: оба дописывают блоки в правую колонку панели комнаты,
-и нижняя часть уезжала за край экрана.
+Side panels (rooms, subjects and so on) scroll with the mouse wheel when their content is taller
+than the screen. Born from a clash between the UI mods **Extra Info** and **Industry Insights**:
+both append blocks to the right column of the room panel, and the bottom part ended up off screen.
 
-## Инструкция
+## Quick start
 
-Готовая сборка лежит в репозитории, в папке `dist/ProperScroll`. Для установки JDK не нужен,
-достаточно скачать репозиторий (Code → Download ZIP или `git clone`).
+A ready-made build is committed in `dist/ProperScroll`. Installing needs no JDK, just download the
+repository (Code → Download ZIP, or `git clone`).
 
-1. Установить. macOS, Linux или Git Bash на Windows:
+1. Install. macOS, Linux or Git Bash on Windows:
    ```sh
    ./install.sh
    ```
-   PowerShell на Windows:
+   PowerShell on Windows:
    ```powershell
    .\install.ps1
    ```
-   Если PowerShell не даёт запускать скрипты: `powershell -ExecutionPolicy Bypass -File .\install.ps1`.
-   Скрипт копирует `dist/ProperScroll` в каталог модов игры: `~/Library/Application Support/songsofsyx/mods`
-   на macOS, `%APPDATA%\songsofsyx\mods` на Windows, `~/.local/share/songsofsyx/mods` на Linux.
-   Другой каталог — через `SOS_MODS_DIR`. Можно и руками: скопировать папку `ProperScroll` туда же.
-2. Запустить игру. В лаунчере на вкладке модов включить **Proper Scroll** рядом с остальными
-   модами и стартовать игру как обычно. Сохранения менять не нужно, мод работает в любой партии.
-3. Проверить: открыть плотницкую (или любую комнату, где стоят Extra Info и Industry Insights),
-   навести курсор на правую колонку и покрутить колесом. Контент должен доезжать до нижних
-   блоков, у правого края появляется тонкая полоска-индикатор. На панелях, где всё влезает,
-   ничего не меняется.
+   If PowerShell refuses to run scripts: `powershell -ExecutionPolicy Bypass -File .\install.ps1`.
+   The script copies `dist/ProperScroll` into the game's mods folder:
+   `~/Library/Application Support/songsofsyx/mods` on macOS, `%APPDATA%\songsofsyx\mods` on Windows,
+   `~/.local/share/songsofsyx/mods` on Linux. Override with `SOS_MODS_DIR`. Copying the
+   `ProperScroll` folder there by hand works just as well.
+2. Start the game. In the launcher's mods tab enable **Proper Scroll** next to your other mods and
+   start as usual. Saves need no changes, the mod works in any game.
+3. Check: open a carpenter (or any room where Extra Info and Industry Insights are active), hover the
+   right column and turn the wheel. The content should reach the bottom blocks, and a thin position
+   indicator appears at the right edge. Panels whose content fits look exactly as before.
 
-Пересобирать (`./build.sh`, см. «Сборка») нужно только после правок кода или обновления игры;
-скрипт обновляет и `dist/`. Удалить мод: выключить в лаунчере или снести папку `ProperScroll`
-из каталога модов.
+Rebuilding (`./build.sh`, see "Building") is only needed after code changes or a game update; the
+script refreshes `dist/` too. To remove the mod, disable it in the launcher or delete the
+`ProperScroll` folder from the mods directory.
 
-## Как это работает
+## How it works
 
-Игра грузит jar-ы скрипт-модов в classpath **перед** `SongsOfSyx.jar`, поэтому класс с тем же
-именем в моде подменяет ванильный. Мод подменяет один класс — `view.interrupter.ISidePanels`
-(контейнер боковых панелей). Код ванильный (0.71.44), кроме внутреннего класса `Panel`:
+The game puts script mod jars on the classpath **before** `SongsOfSyx.jar`, so a class with the
+same name in a mod replaces the vanilla one. This mod replaces a single class,
+`view.interrupter.ISidePanels` (the container of side panels). The code is vanilla (0.71.44)
+except for the inner `Panel` class:
 
-- если секция панели выше видимой области больше чем на 40 px, колесо мыши сдвигает содержимое.
-  Меньший свес игнорируется: часть ванильных панелей (например, список комнат) строится на высоту
-  экрана, а потом получает строку сверху и в ванили висит за нижним краем на пару десятков
-  пикселей, скролл там не нужен;
-- у правого края рисуется тонкий индикатор положения (3 px, в поле между контентом и рамкой);
-- рендерер игры не умеет клиппинг, поэтому элементы, которые вылезли бы за пределы панели,
-  на время отрисовки и наведения «паркуются» за экраном, а полоса заголовка и нижний отступ
-  перерисовываются поверх контента;
-- при открытии панели заново позиция прокрутки сбрасывается.
+- when a panel's section is more than 40 px taller than the visible area, the mouse wheel moves
+  the content. Smaller overhang is ignored: some vanilla panels (the room list, for one) are laid
+  out to the screen height and then get a row stacked on top, so in vanilla they hang a couple of
+  dozen pixels past the bottom edge and need no scrolling;
+- a thin position indicator (3 px, in the gap between the content and the frame) is drawn at the
+  right edge;
+- the game's renderer cannot clip, so elements that would spill out of the panel are parked off
+  screen for the duration of rendering and hover handling, and the title bar and the bottom margin
+  are redrawn on top of the content;
+- reopening a panel resets the scroll position.
 
-Если контент влезает, поведение панели совпадает с ванильным.
+When the content fits, the panel behaves exactly like vanilla.
 
-Чистая геометрия (`properscroll.ScrollMath`) вынесена в класс без зависимостей от игры и
-покрыта тестами (`src/test`), тесты гоняются при сборке.
+The pure geometry (`properscroll.ScrollMath`) lives in a class with no game dependencies and is
+covered by tests (`src/test`), which run as part of the build.
 
-## Сборка
+## Building
 
-Нужен JDK 21+ и установленная игра (для classpath). На Windows скрипт запускается из Git Bash.
-Jar игры ищется в стандартных путях Steam для текущей ОС (на Windows
-`C:\Program Files (x86)\Steam\...`), другой путь — через `SOS_JAR`. Собранный мод не зависит от
-ОС: это Java-байткод, собранное на одной машине работает на любой другой с той же версией игры.
+Needs a JDK 21+ and an installed copy of the game (for the classpath). On Windows run the script
+from Git Bash. The game jar is looked up in the standard Steam locations for the current OS (on
+Windows `C:\Program Files (x86)\Steam\...`); point `SOS_JAR` at it otherwise. The built mod is OS
+independent: it is Java bytecode, a build from one machine runs on any other with the same game
+version.
 
 ```sh
 ./build.sh
 ```
 
-Скрипт компилирует, прогоняет тесты, складывает мод в `build/mod/ProperScroll`
-(`_Info.txt` + `V71/script/ProperScroll.jar`), пакует релизный zip в `build/` и обновляет
-коммитимую копию в `dist/ProperScroll`. Номер версии для папки `V<major>` берётся из jar игры.
+The script compiles, runs the tests, assembles the mod in `build/mod/ProperScroll`
+(`_Info.txt` + `V71/script/ProperScroll.jar`), packs a release zip into `build/` and refreshes the
+committed copy in `dist/ProperScroll`. The `V<major>` folder name is taken from the game jar.
 
-## Установка
-
-```sh
-./install.sh        # macOS, Linux, Git Bash на Windows
-.\install.ps1       # PowerShell на Windows
-```
-
-Копирует `dist/ProperScroll` в каталог модов игры для текущей ОС (см. «Инструкция»), другой
-каталог — через `SOS_MODS_DIR`. Дальше в лаунчере игры включить мод **Proper Scroll**.
-
-## Публикация
-
-Мод для игры это папка `ProperScroll/` с `_Info.txt` и `V71/script/ProperScroll.jar`, поэтому
-раздаётся она целиком. Готовая копия закоммичена в `dist/`, так что установить можно прямо из
-скачанного репозитория. Кроме того `build.sh` кладёт архив `build/ProperScroll-<версия>.zip`
-(версия из `mod/_Info.txt`), его удобно прикладывать к релизу на GitHub:
+## Installing
 
 ```sh
-gh release create v1.0.0 build/ProperScroll-1.0.0.zip
+./install.sh        # macOS, Linux, Git Bash on Windows
+.\install.ps1       # PowerShell on Windows
 ```
 
-Пользователю достаточно распаковать архив в каталог модов игры и включить мод в лаунчере.
-Собирать в CI не выйдет: компиляция требует `SongsOfSyx.jar`, а он проприетарный и в
-репозиторий не кладётся, так что сборка и загрузка архива делаются локально.
+Copies `dist/ProperScroll` into the game's mods folder for the current OS (see "Quick start");
+override the folder with `SOS_MODS_DIR`. Then enable **Proper Scroll** in the game launcher.
 
-## Совместимость
+## Publishing
 
-- Собрано и проверено на классе из версии игры 0.71.44. После обновления игры нужно сверить
-  `ISidePanels` с новым ванильным классом и пересобрать.
-- Конфликтует только с модами, которые подменяют тот же класс `view.interrupter.ISidePanels`.
-  Из установленных Workshop-модов таких нет (Extra Info подменяет `UIRoomModule` и модули
-  комнат, Industry Insights — `Modules`, PrPleGooQoL — `IPromtScreen` и `ITextInput`).
+To the game, a mod is the `ProperScroll/` folder with `_Info.txt` and `V71/script/ProperScroll.jar`,
+so it is distributed as a whole. A ready copy is committed in `dist/`, so the mod can be installed
+straight from a downloaded repository. `build.sh` also packs `build/ProperScroll-<version>.zip`
+(version from `mod/_Info.txt`), handy as a GitHub release asset:
 
-## Известные ограничения
+```sh
+gh release create v1.0.1 build/ProperScroll-1.0.1.zip
+```
 
-- Элемент выше 48 px, пересекающий верхнюю границу области прокрутки, скрывается целиком,
-  как только его верх поднимается выше полосы заголовка (иначе он нарисовался бы поверх
-  верхней панели игры). На практике это только шапка панели комнаты: она исчезает, когда
-  от неё остаётся меньше ~40 px.
-- Скроллбар не перетаскивается мышью, только колесо.
+Users unpack the archive into the game's mods folder and enable the mod in the launcher.
+CI builds are not an option: compiling needs `SongsOfSyx.jar`, which is proprietary and not
+committed, so building and uploading the archive happen locally.
+
+## Compatibility
+
+- Built against and checked with game version 0.71.44. After a game update, compare `ISidePanels`
+  with the new vanilla class and rebuild.
+- Conflicts only with mods that replace the same class, `view.interrupter.ISidePanels`. The popular
+  UI mods replace other classes (Extra Info: `UIRoomModule` and the room modules, Industry Insights:
+  `Modules`, PrPleGooQoL: `IPromtScreen` and `ITextInput`), so they coexist with this one.
+
+## Known limitations
+
+- An element taller than 48 px that crosses the top edge of the scroll area is hidden as a whole
+  once its top rises above the title bar (otherwise it would draw over the game's top panel). In
+  practice this only affects the room panel header: it disappears when less than ~40 px of it
+  remain visible.
+- The indicator cannot be dragged, scrolling is wheel only.
