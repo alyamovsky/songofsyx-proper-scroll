@@ -6,9 +6,14 @@ public final class ScrollMath {
     private ScrollMath() {
     }
 
-    /** How far the content can be scrolled; zero when it fits. */
-    public static int maxScroll(int contentHeight, int viewHeight) {
-        return Math.max(0, contentHeight - viewHeight);
+    /**
+     * How far the content can be scrolled. Zero when it fits, and also when it overhangs by no more
+     * than {@code tolerance}: several vanilla panels are laid out to the screen height and then get an
+     * extra row stacked on top, so they hang a little past the bottom edge by design.
+     */
+    public static int maxScroll(int contentHeight, int viewHeight, int tolerance) {
+        int overflow = contentHeight - viewHeight;
+        return overflow > tolerance ? overflow : 0;
     }
 
     public static int clamp(int value, int min, int max) {

@@ -18,9 +18,12 @@ public final class ScrollMathTest {
     }
 
     private static void maxScroll() {
-        check(ScrollMath.maxScroll(500, 600) == 0, "content shorter than view needs no scroll");
-        check(ScrollMath.maxScroll(600, 600) == 0, "content equal to view needs no scroll");
-        check(ScrollMath.maxScroll(1100, 661) == 439, "overflow is content minus view");
+        check(ScrollMath.maxScroll(500, 600, 0) == 0, "content shorter than view needs no scroll");
+        check(ScrollMath.maxScroll(600, 600, 0) == 0, "content equal to view needs no scroll");
+        check(ScrollMath.maxScroll(1100, 661, 0) == 439, "overflow is content minus view");
+        check(ScrollMath.maxScroll(690, 661, 40) == 0, "overhang within tolerance is ignored");
+        check(ScrollMath.maxScroll(701, 661, 40) == 0, "overhang equal to tolerance is ignored");
+        check(ScrollMath.maxScroll(702, 661, 40) == 41, "overhang above tolerance scrolls in full");
     }
 
     private static void clamp() {

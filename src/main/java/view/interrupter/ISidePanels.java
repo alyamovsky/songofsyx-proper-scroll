@@ -35,6 +35,8 @@ public final class ISidePanels extends Interrupter {
     private static final int VIEW_Y1 = ISidePanel.Y2 + ISidePanel.M;
     /** Pixels per mouse wheel notch. */
     private static final int SCROLL_STEP = 40;
+    /** Overhang past the bottom margin that is left alone, see ScrollMath.maxScroll. */
+    private static final int OVERFLOW_TOLERANCE = 40;
     private static final int MIN_THUMB = 16;
     /** Culled elements are parked this far away for the duration of one render call. */
     private static final int CULL_OFFSET = 1 << 20;
@@ -275,7 +277,7 @@ public final class ISidePanels extends Interrupter {
         }
 
         private int overflow() {
-            return ScrollMath.maxScroll(content.body().height(), viewY2() - VIEW_Y1);
+            return ScrollMath.maxScroll(content.body().height(), viewY2() - VIEW_Y1, OVERFLOW_TOLERANCE);
         }
 
         @Override
